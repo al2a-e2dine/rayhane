@@ -1,3 +1,42 @@
+<?php
+include_once('inc/connect.php');
+
+session_start();
+
+if(isset($_SESSION['user_id'])){
+    header('location:index.php');
+}
+
+if(isset($_POST['user_login'])){
+    $username=$_POST['username'];
+    $password=$_POST['password'];
+
+    $password=md5($password);
+
+    $q="SELECT * FROM `users` WHERE `username`='$username' and `password`='$password'";
+    $r=mysqli_query($dbc,$q);
+    $num=mysqli_num_rows($r);
+
+    if($num==1){
+        $row=mysqli_fetch_assoc($r);
+
+            if($row['archived']==0){
+                $_SESSION['user_id']=$row['id'];
+                $_SESSION['user_fullname']=$row['fullname'];
+                $_SESSION['user_phone']=$row['phone'];
+                $_SESSION['user_username']=$row['username'];
+                header('location:index.php');
+            }else{
+                $msg="تم حذف هذا الحساب";
+            }
+        
+    }else{
+        $msg="هناك خطأ في اسم المستخدم أو كلمة السر";
+    }
+
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,7 +48,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>SB Admin 2 - Login</title>
+    <title>مركز الريحان</title>
 
     <!-- Custom fonts for this template-->
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -35,46 +74,36 @@
                     <div class="card-body p-0">
                         <!-- Nested Row within Card Body -->
                         <div class="row">
-                            <div class="col-lg-6 d-none d-lg-block bg-login-image"></div>
-                            <div class="col-lg-6">
+                            <!-- <div class="col-lg-6 d-none d-lg-block bg-login-image"></div> -->
+                            <div class="col-lg">
                                 <div class="p-5">
                                     <div class="text-center">
-                                        <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
+                                        <h1 class="h4 text-gray-900 mb-4">مرحبا بعودتك</h1>
+
+                                    <?php if(isset($msg)){ ?>
+                                        <div class="alert alert-info">
+                                            <strong>مركز الريحان!</strong> <?= $msg ?>
+                                        </div>
+                                    <?php } ?>
+
                                     </div>
-                                    <form class="user">
+                                    <form class="user" action="user_login.php" method="post">
                                         <div class="form-group">
-                                            <input type="email" class="form-control form-control-user"
-                                                id="exampleInputEmail" aria-describedby="emailHelp"
-                                                placeholder="Enter Email Address...">
+                                            <input type="text" class="form-control form-control-user"
+                                                placeholder="اسم المستخدم" name="username" required>
                                         </div>
                                         <div class="form-group">
                                             <input type="password" class="form-control form-control-user"
-                                                id="exampleInputPassword" placeholder="Password">
+                                                id="exampleInputPassword" placeholder="كلمة السر" name="password" required>
                                         </div>
-                                        <div class="form-group">
-                                            <div class="custom-control custom-checkbox small">
-                                                <input type="checkbox" class="custom-control-input" id="customCheck">
-                                                <label class="custom-control-label" for="customCheck">Remember
-                                                    Me</label>
-                                            </div>
-                                        </div>
-                                        <a href="index.html" class="btn btn-primary btn-user btn-block">
-                                            Login
-                                        </a>
-                                        <hr>
-                                        <a href="index.html" class="btn btn-google btn-user btn-block">
-                                            <i class="fab fa-google fa-fw"></i> Login with Google
-                                        </a>
-                                        <a href="index.html" class="btn btn-facebook btn-user btn-block">
-                                            <i class="fab fa-facebook-f fa-fw"></i> Login with Facebook
-                                        </a>
+                                        <input type="submit" name="user_login" class="btn btn-primary btn-user btn-block" value="تسجيل الدخول">
                                     </form>
                                     <hr>
                                     <div class="text-center">
-                                        <a class="small" href="forgot-password.html">Forgot Password?</a>
+                                        <a class="small" href="index.php">الصفحة الرئيسية</a>
                                     </div>
                                     <div class="text-center">
-                                        <a class="small" href="register.html">Create an Account!</a>
+                                        <a class="small" href="user_register.php">انشاء حساب جديد</a>
                                     </div>
                                 </div>
                             </div>
