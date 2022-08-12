@@ -11,8 +11,6 @@ if(isset($_POST['user_login'])){
     $username=$_POST['username'];
     $password=$_POST['password'];
 
-    $password=md5($password);
-
     $q="SELECT * FROM `users` WHERE `username`='$username' and `password`='$password'";
     $r=mysqli_query($dbc,$q);
     $num=mysqli_num_rows($r);
